@@ -1,5 +1,4 @@
-import type { IExecuteFunctions } from 'n8n-workflow';
-import { NodeOperationError } from 'n8n-workflow';
+import { IExecuteFunctions, NodeOperationError } from 'n8n-workflow';
 import { AssetsResource } from '../../../../../nodes/Karakeep/resources/AssetsResource';
 import { KarakeepApiRequest } from '../../../../../nodes/shared/KarakeepApiRequest';
 
@@ -20,24 +19,24 @@ jest.mock('../../../../../nodes/shared/utils', () => ({
 	}),
 }));
 
-describe('AssetsResource', () => {
-	let mockExecuteFunctions: Partial<IExecuteFunctions>;
+// Mock IExecuteFunctions
+const mockExecuteFunctions = {
+	getNodeParameter: jest.fn(),
+	getNode: jest.fn(() => ({
+		name: 'Test Node',
+		id: 'test-id',
+		typeVersion: 1,
+		type: 'karakeep',
+		position: [0, 0],
+		parameters: {}
+	})),
+	helpers: {
+		assertBinaryData: jest.fn(),
+	} as any,
+} as unknown as IExecuteFunctions;
 
+describe('AssetsResource', () => {
 	beforeEach(() => {
-		mockExecuteFunctions = {
-			getNodeParameter: jest.fn(),
-			getNode: jest.fn(() => ({
-				name: 'Test Node',
-				id: 'test-id',
-				typeVersion: 1,
-				type: 'karakeep',
-				position: [0, 0],
-				parameters: {}
-			})),
-			helpers: {
-				assertBinaryData: jest.fn(),
-			} as any,
-		};
 		jest.clearAllMocks();
 	});
 
@@ -46,7 +45,7 @@ describe('AssetsResource', () => {
 			const uploadSpy = jest.spyOn(AssetsResource as any, 'upload').mockResolvedValue({ id: 'asset-1' });
 
 			const result = await AssetsResource.execute.call(
-				mockExecuteFunctions as IExecuteFunctions,
+				mockExecuteFunctions,
 				'upload',
 				0
 			);
@@ -59,7 +58,7 @@ describe('AssetsResource', () => {
 			const getByIdSpy = jest.spyOn(AssetsResource as any, 'getById').mockResolvedValue({ id: 'asset-1' });
 
 			const result = await AssetsResource.execute.call(
-				mockExecuteFunctions as IExecuteFunctions,
+				mockExecuteFunctions,
 				'getById',
 				0
 			);
@@ -72,7 +71,7 @@ describe('AssetsResource', () => {
 			const downloadSpy = jest.spyOn(AssetsResource as any, 'download').mockResolvedValue({ id: 'asset-1' });
 
 			const result = await AssetsResource.execute.call(
-				mockExecuteFunctions as IExecuteFunctions,
+				mockExecuteFunctions,
 				'download',
 				0
 			);
@@ -84,7 +83,7 @@ describe('AssetsResource', () => {
 		it('should throw error for unsupported operation', async () => {
 			await expect(
 				AssetsResource.execute.call(
-					mockExecuteFunctions as IExecuteFunctions,
+					mockExecuteFunctions,
 					'unsupported' as any,
 					0
 				)
