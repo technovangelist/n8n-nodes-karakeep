@@ -31,22 +31,16 @@ import {
 } from '../../../nodes/shared/utils';
 
 import {
-	KarakeepError,
-	ValidationResult,
 	CreateBookmarkInput,
-	UpdateBookmarkInput,
 	CreateListInput,
-	UpdateListInput,
 	CreateTagInput,
-	UpdateTagInput,
 	CreateHighlightInput,
-	UpdateHighlightInput,
 	PaginationParams,
 	RetryConfig,
 	TransformationRule,
 	CacheOptions,
 } from '../../../nodes/shared/types';
-import { beforeEach } from 'node:test';
+
 
 describe('URL and Network Utilities', () => {
 	describe('validateUrl', () => {
@@ -190,6 +184,7 @@ describe('Validation Utilities', () => {
 	describe('validateBookmarkInput', () => {
 		it('should validate create bookmark input', () => {
 			const validInput: CreateBookmarkInput = {
+				type: 'link',
 				url: 'https://example.com',
 				title: 'Test Bookmark',
 			};
@@ -199,6 +194,7 @@ describe('Validation Utilities', () => {
 
 		it('should reject invalid URL', () => {
 			const invalidInput: CreateBookmarkInput = {
+				type: 'link',
 				url: 'not-a-url',
 			};
 			const result = validateBookmarkInput(invalidInput);
@@ -208,6 +204,7 @@ describe('Validation Utilities', () => {
 
 		it('should reject too long title', () => {
 			const invalidInput: CreateBookmarkInput = {
+				type: 'link',
 				url: 'https://example.com',
 				title: 'a'.repeat(501),
 			};
@@ -218,6 +215,7 @@ describe('Validation Utilities', () => {
 
 		it('should reject too many tags', () => {
 			const invalidInput: CreateBookmarkInput = {
+				type: 'link',
 				url: 'https://example.com',
 				tags: Array(51).fill('tag'),
 			};
@@ -232,6 +230,7 @@ describe('Validation Utilities', () => {
 			const validInput: CreateListInput = {
 				name: 'Test List',
 				description: 'A test list',
+				icon: 'list',
 			};
 			const result = validateListInput(validInput);
 			expect(result.isValid).toBe(true);
@@ -240,6 +239,7 @@ describe('Validation Utilities', () => {
 		it('should reject too long name', () => {
 			const invalidInput: CreateListInput = {
 				name: 'a'.repeat(201),
+				icon: 'list',
 			};
 			const result = validateListInput(invalidInput);
 			expect(result.isValid).toBe(false);

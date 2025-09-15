@@ -28,6 +28,8 @@ describe('BookmarksResource', () => {
 			await BookmarksResource.execute.call(mockExecuteFunctions, 'getById', 0);
 			
 			expect(getByIdSpy).toHaveBeenCalledWith(0);
+			
+			getByIdSpy.mockRestore();
 		});
 
 		it('should throw error for unsupported operation', async () => {
@@ -137,11 +139,15 @@ describe('BookmarksResource', () => {
 			(mockExecuteFunctions.getNodeParameter as jest.Mock)
 				.mockImplementation((param) => {
 					switch (param) {
+						case 'bookmarkType': return 'link';
 						case 'url': return 'https://example.com';
 						case 'title': return '';
 						case 'note': return '';
 						case 'tags': return '';
 						case 'archived': return false;
+						case 'favourited': return false;
+						case 'summary': return '';
+						case 'crawlPriority': return 'normal';
 						default: return '';
 					}
 				});
@@ -155,7 +161,10 @@ describe('BookmarksResource', () => {
 				method: 'POST',
 				endpoint: 'bookmarks',
 				body: {
+					type: 'link',
 					url: 'https://example.com',
+					archived: false,
+					favourited: false,
 				},
 			});
 			expect(result).toEqual(mockBookmark);
@@ -174,11 +183,15 @@ describe('BookmarksResource', () => {
 			(mockExecuteFunctions.getNodeParameter as jest.Mock)
 				.mockImplementation((param) => {
 					switch (param) {
+						case 'bookmarkType': return 'link';
 						case 'url': return 'https://example.com';
 						case 'title': return 'Example';
 						case 'note': return 'Test note';
 						case 'tags': return 'work, important';
 						case 'archived': return true;
+						case 'favourited': return false;
+						case 'summary': return '';
+						case 'crawlPriority': return 'normal';
 						default: return '';
 					}
 				});
@@ -192,10 +205,12 @@ describe('BookmarksResource', () => {
 				method: 'POST',
 				endpoint: 'bookmarks',
 				body: {
+					type: 'link',
 					url: 'https://example.com',
 					title: 'Example',
 					note: 'Test note',
 					archived: true,
+					favourited: false,
 					tags: ['work', 'important'],
 				},
 			});
@@ -206,6 +221,7 @@ describe('BookmarksResource', () => {
 			(mockExecuteFunctions.getNodeParameter as jest.Mock)
 				.mockImplementation((param) => {
 					switch (param) {
+						case 'bookmarkType': return 'link';
 						case 'url': return 'invalid-url';
 						default: return '';
 					}
@@ -220,6 +236,7 @@ describe('BookmarksResource', () => {
 			(mockExecuteFunctions.getNodeParameter as jest.Mock)
 				.mockImplementation((param) => {
 					switch (param) {
+						case 'bookmarkType': return 'link';
 						case 'url': return '';
 						default: return '';
 					}
@@ -246,7 +263,18 @@ describe('BookmarksResource', () => {
 						case 'bookmarkId': return '123';
 						case 'title': return 'Updated Title';
 						case 'note': return '';
+						case 'summary': return '';
 						case 'archived': return true;
+						case 'favourited': return undefined;
+						case 'updateUrl': return '';
+						case 'description': return '';
+						case 'author': return '';
+						case 'publisher': return '';
+						case 'datePublished': return '';
+						case 'dateModified': return '';
+						case 'textContent': return '';
+						case 'assetContent': return '';
+						case 'createdAt': return '';
 						default: return '';
 					}
 				});
@@ -283,7 +311,18 @@ describe('BookmarksResource', () => {
 						case 'bookmarkId': return '123';
 						case 'title': return '';
 						case 'note': return '';
+						case 'summary': return '';
 						case 'archived': return undefined;
+						case 'favourited': return undefined;
+						case 'updateUrl': return '';
+						case 'description': return '';
+						case 'author': return '';
+						case 'publisher': return '';
+						case 'datePublished': return '';
+						case 'dateModified': return '';
+						case 'textContent': return '';
+						case 'assetContent': return '';
+						case 'createdAt': return '';
 						default: return '';
 					}
 				});
@@ -330,7 +369,7 @@ describe('BookmarksResource', () => {
 			(mockExecuteFunctions.getNodeParameter as jest.Mock)
 				.mockImplementation((param) => {
 					switch (param) {
-						case 'query': return 'example';
+						case 'searchQuery': return 'example';
 						case 'searchOptions': return {};
 						default: return '';
 					}
@@ -345,7 +384,7 @@ describe('BookmarksResource', () => {
 				method: 'GET',
 				endpoint: 'bookmarks/search',
 				params: {
-					query: 'example',
+					q: 'example',
 				},
 			});
 			expect(result).toEqual(mockBookmarks);
@@ -364,7 +403,7 @@ describe('BookmarksResource', () => {
 			(mockExecuteFunctions.getNodeParameter as jest.Mock)
 				.mockImplementation((param) => {
 					switch (param) {
-						case 'query': return 'example';
+						case 'searchQuery': return 'example';
 						case 'searchOptions': return searchOptions;
 						default: return '';
 					}
@@ -380,13 +419,8 @@ describe('BookmarksResource', () => {
 				method: 'GET',
 				endpoint: 'bookmarks/search',
 				params: {
-					query: 'example',
-					page: 1,
+					q: 'example',
 					limit: 20,
-					archived: false,
-					tags: ['work', 'important'],
-					startDate: '2023-01-01T00:00:00.000Z',
-					endDate: '2023-12-31T23:59:59.999Z',
 				},
 			});
 			expect(result).toEqual(mockBookmarks);
@@ -396,7 +430,7 @@ describe('BookmarksResource', () => {
 			(mockExecuteFunctions.getNodeParameter as jest.Mock)
 				.mockImplementation((param) => {
 					switch (param) {
-						case 'query': return '';
+						case 'searchQuery': return '';
 						default: return {};
 					}
 				});
@@ -420,6 +454,7 @@ describe('BookmarksResource', () => {
 					switch (param) {
 						case 'bookmarkId': return '123';
 						case 'tagAction': return 'add';
+						case 'tagsInputMethod': return 'names';
 						case 'tagsToManage': return 'work, important';
 						default: return '';
 					}
@@ -433,7 +468,7 @@ describe('BookmarksResource', () => {
 			expect(KarakeepApiRequest.apiRequest).toHaveBeenCalledWith({
 				method: 'POST',
 				endpoint: 'bookmarks/123/tags',
-				body: { tags: ['work', 'important'] },
+				body: { tags: [{ tagName: 'work' }, { tagName: 'important' }] },
 			});
 			expect(result).toEqual(mockBookmark);
 		});
@@ -450,6 +485,7 @@ describe('BookmarksResource', () => {
 					switch (param) {
 						case 'bookmarkId': return '123';
 						case 'tagAction': return 'remove';
+						case 'tagsInputMethod': return 'names';
 						case 'tagsToManage': return 'work';
 						default: return '';
 					}
@@ -463,7 +499,7 @@ describe('BookmarksResource', () => {
 			expect(KarakeepApiRequest.apiRequest).toHaveBeenCalledWith({
 				method: 'DELETE',
 				endpoint: 'bookmarks/123/tags',
-				body: { tags: ['work'] },
+				body: { tags: [{ tagName: 'work' }] },
 			});
 			expect(result).toEqual(mockBookmark);
 		});
@@ -490,6 +526,7 @@ describe('BookmarksResource', () => {
 					switch (param) {
 						case 'bookmarkId': return '123';
 						case 'tagAction': return 'add';
+						case 'tagsInputMethod': return 'names';
 						case 'tagsToManage': return '';
 						default: return '';
 					}
@@ -513,8 +550,9 @@ describe('BookmarksResource', () => {
 				.mockImplementation((param) => {
 					switch (param) {
 						case 'bookmarkId': return '123';
-						case 'assetAction': return 'add';
+						case 'assetAction': return 'attach';
 						case 'assetId': return 'asset-123';
+						case 'assetType': return 'image';
 						default: return '';
 					}
 				});
@@ -527,39 +565,38 @@ describe('BookmarksResource', () => {
 			expect(KarakeepApiRequest.apiRequest).toHaveBeenCalledWith({
 				method: 'POST',
 				endpoint: 'bookmarks/123/assets',
-				body: { assetId: 'asset-123' },
+				body: { id: 'asset-123', assetType: 'image' },
 			});
 			expect(result).toEqual(mockBookmark);
 		});
 
 		it('should remove asset from bookmark', async () => {
-			const mockBookmark = { 
-				id: '123', 
-				url: 'https://example.com',
-				assets: []
+			const expectedResult = { 
+				success: true,
+				action: 'detach',
+				bookmarkId: '123'
 			};
 			
 			(mockExecuteFunctions.getNodeParameter as jest.Mock)
 				.mockImplementation((param) => {
 					switch (param) {
 						case 'bookmarkId': return '123';
-						case 'assetAction': return 'remove';
-						case 'assetId': return 'asset-123';
+						case 'assetAction': return 'detach';
+						case 'currentAssetId': return 'asset-123';
 						default: return '';
 					}
 				});
 			
 			(KarakeepApiRequest.apiRequest as jest.Mock)
-				.mockResolvedValue({ data: mockBookmark });
+				.mockResolvedValue({ data: {} });
 
 			const result = await (BookmarksResource as any).manageAssets.call(mockExecuteFunctions, 0);
 
 			expect(KarakeepApiRequest.apiRequest).toHaveBeenCalledWith({
 				method: 'DELETE',
 				endpoint: 'bookmarks/123/assets/asset-123',
-				body: undefined,
 			});
-			expect(result).toEqual(mockBookmark);
+			expect(result).toEqual(expectedResult);
 		});
 
 		it('should throw error when bookmark ID is missing', async () => {

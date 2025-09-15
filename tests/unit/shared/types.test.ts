@@ -109,14 +109,16 @@ describe('Type Definitions', () => {
 				id: '123',
 				name: 'Test List',
 				description: 'A test list',
-				isPublic: true,
+				icon: 'list',
+				type: 'manual',
+				public: true,
 				bookmarkCount: 5,
 				createdAt: '2023-01-01T00:00:00Z',
 				updatedAt: '2023-01-01T00:00:00Z',
 			};
 
 			expect(list.name).toBe('Test List');
-			expect(list.isPublic).toBe(true);
+			expect(list.public).toBe(true);
 		});
 
 		it('should define Tag correctly', () => {
@@ -176,6 +178,7 @@ describe('Type Definitions', () => {
 	describe('Input Types', () => {
 		it('should define CreateBookmarkInput correctly', () => {
 			const input: CreateBookmarkInput = {
+				type: 'link',
 				url: 'https://example.com',
 				title: 'Test Bookmark',
 				note: 'Test note',
@@ -201,11 +204,11 @@ describe('Type Definitions', () => {
 			const input: CreateListInput = {
 				name: 'Test List',
 				description: 'A test list',
-				isPublic: true,
+				icon: 'list',
 			};
 
 			expect(input.name).toBe('Test List');
-			expect(input.isPublic).toBe(true);
+			expect(input.icon).toBe('list');
 		});
 
 		it('should define CreateHighlightInput correctly', () => {
@@ -313,6 +316,7 @@ describe('Type Definitions', () => {
 
 		it('should define BookmarkSearchParams correctly', () => {
 			const params: BookmarkSearchParams = {
+				q: 'test',
 				page: 1,
 				limit: 10,
 				query: 'test',

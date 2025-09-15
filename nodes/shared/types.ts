@@ -133,6 +133,13 @@ export interface BookmarkSearchParams {
 	limit?: number;
 	cursor?: string;
 	includeContent?: boolean;
+	// Legacy properties for backward compatibility
+	query?: string;
+	tags?: string[];
+	archived?: boolean;
+	startDate?: string;
+	endDate?: string;
+	page?: number;
 }
 
 // Filter Parameters for Lists
