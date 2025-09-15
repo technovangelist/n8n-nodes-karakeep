@@ -74,7 +74,7 @@ describe('Karakeep Node Integration', () => {
 	it('should have proper node metadata for n8n', () => {
 		const { description } = karakeepNode;
 		
-		expect(description.icon).toBe('file:karakeep.svg');
+		expect(description.icon).toBe('file:logo.svg');
 		expect(description.group).toEqual(['transform']);
 		expect(description.subtitle).toBe('={{$parameter["operation"] + ": " + $parameter["resource"]}}');
 		expect(description.description).toBe('Interact with Karakeep bookmark management service');

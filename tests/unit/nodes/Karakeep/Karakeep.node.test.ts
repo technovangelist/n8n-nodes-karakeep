@@ -186,7 +186,7 @@ describe('Karakeep Node', () => {
 		it('should have proper node metadata', () => {
 			const { description } = karakeepNode;
 			
-			expect(description.icon).toBe('file:karakeep.svg');
+			expect(description.icon).toBe('file:logo.svg');
 			expect(description.subtitle).toBe('={{$parameter["operation"] + ": " + $parameter["resource"]}}');
 			expect(description.description).toBe('Interact with Karakeep bookmark management service');
 			expect(description.defaults.name).toBe('Karakeep');

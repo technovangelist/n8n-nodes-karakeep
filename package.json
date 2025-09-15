@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-karakeep",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "n8n node for Karakeep bookmark management service",
   "keywords": [
     "n8n-community-node-package",
@@ -39,7 +39,7 @@
     "publish:major": "npm run prepublish:major && npm run publish:release",
     "publish:release": "npm run build && npm run test && npm pack && npm publish",
     "publish:dry": "npm run build && npm run test && npm pack && npm publish --dry-run",
-    "publish:interactive": "./scripts/publish.sh",
+    "publish": "./scripts/publish.sh",
     "publish:quick": "npm run build && npm pack && npm publish",
     "link:n8n": "npm run build && npm link && cd ~/.n8n && npm link n8n-nodes-karakeep",
     "unlink:n8n": "cd ~/.n8n && npm unlink n8n-nodes-karakeep && npm unlink -g n8n-nodes-karakeep"
@@ -53,8 +53,7 @@
       "dist/credentials/KarakeepApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/Karakeep/Karakeep.node.js",
-      "dist/nodes/KarakeepTest/KarakeepTest.node.js"
+      "dist/nodes/Karakeep/Karakeep.node.js"
     ]
   },
   "devDependencies": {
