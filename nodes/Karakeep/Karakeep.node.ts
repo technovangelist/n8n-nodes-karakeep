@@ -25,7 +25,7 @@ export class Karakeep implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Karakeep',
 		name: 'karakeep',
-		icon: 'file:karakeep.svg',
+		icon: 'file:logo.svg',
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
