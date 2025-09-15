@@ -1,0 +1,164 @@
+{
+  "name": "Karakeep Bookmarks Management",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "bookmarks",
+        "operation": "create",
+        "bookmarkType": "link",
+        "url": "https://example.com",
+        "title": "Example Website",
+        "note": "This is a test bookmark",
+        "tags": "test, example",
+        "archived": false,
+        "favourited": true
+      },
+      "id": "create-link-bookmark",
+      "name": "Create Link Bookmark",
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "resource": "bookmarks",
+        "operation": "create",
+        "bookmarkType": "text",
+        "text": "This is important text content to save",
+        "title": "Text Note",
+        "note": "Saved from meeting notes",
+        "tags": "notes, meeting",
+        "archived": false
+      },
+      "id": "create-text-bookmark",
+      "name": "Create Text Bookmark",
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [250, 450]
+    },
+    {
+      "parameters": {
+        "resource": "bookmarks",
+        "operation": "getAll",
+        "additionalFields": {
+          "page": 1,
+          "limit": 10,
+          "archived": "false",
+          "tags": "test"
+        }
+      },
+      "id": "get-bookmarks",
+      "name": "Get All Bookmarks",
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "resource": "bookmarks",
+        "operation": "search",
+        "searchQuery": "example tutorial",
+        "searchOptions": {
+          "sortOrder": "relevance",
+          "limit": 20,
+          "includeContent": true
+        }
+      },
+      "id": "search-bookmarks",
+      "name": "Search Bookmarks",
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "resource": "bookmarks",
+        "operation": "manageTags",
+        "bookmarkId": "{{ $json.id }}",
+        "tagAction": "add",
+        "tagsInputMethod": "names",
+        "tagsToManage": "workflow, automation"
+      },
+      "id": "add-tags",
+      "name": "Add Tags to Bookmark",
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "resource": "bookmarks",
+        "operation": "manageAssets",
+        "bookmarkId": "{{ $json.id }}",
+        "assetAction": "attach",
+        "assetId": "asset-456",
+        "assetType": "screenshot"
+      },
+      "id": "attach-asset",
+      "name": "Attach Asset to Bookmark",
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    }
+  ],
+  "connections": {
+    "Create Link Bookmark": {
+      "main": [
+        [
+          {
+            "node": "Get All Bookmarks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Text Bookmark": {
+      "main": [
+        [
+          {
+            "node": "Get All Bookmarks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Bookmarks": {
+      "main": [
+        [
+          {
+            "node": "Search Bookmarks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Bookmarks": {
+      "main": [
+        [
+          {
+            "node": "Add Tags to Bookmark",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Tags to Bookmark": {
+      "main": [
+        [
+          {
+            "node": "Attach Asset to Bookmark",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "1"
+}

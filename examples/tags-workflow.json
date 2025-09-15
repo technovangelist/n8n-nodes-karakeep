@@ -1,0 +1,278 @@
+{
+  "name": "Karakeep Tags Management",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "f8b8c8e0-1234-4567-8901-123456789abc",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "tags",
+        "operation": "getAll",
+        "additionalFields": {
+          "includeUsageStats": true,
+          "sortBy": "usageCount",
+          "sortOrder": "desc",
+          "limit": 50
+        }
+      },
+      "id": "a1b2c3d4-5678-9012-3456-789012345678",
+      "name": "Get All Tags",
+      "type": "karakeep",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ],
+      "credentials": {
+        "karakeepApi": {
+          "id": "1",
+          "name": "Karakeep API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.usageCount }}",
+              "operation": "equal",
+              "value2": "0"
+            }
+          ]
+        }
+      },
+      "id": "b2c3d4e5-6789-0123-4567-890123456789",
+      "name": "Filter Unused Tags",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "tags",
+        "operation": "delete",
+        "tagId": "={{ $json.id }}",
+        "forceDelete": false
+      },
+      "id": "c3d4e5f6-7890-1234-5678-901234567890",
+      "name": "Delete Unused Tag",
+      "type": "karakeep",
+      "typeVersion": 1,
+      "position": [
+        900,
+        200
+      ],
+      "credentials": {
+        "karakeepApi": {
+          "id": "1",
+          "name": "Karakeep API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "tags",
+        "operation": "create",
+        "name": "New Tag",
+        "preventDuplicates": true
+      },
+      "id": "d4e5f6g7-8901-2345-6789-012345678901",
+      "name": "Create New Tag",
+      "type": "karakeep",
+      "typeVersion": 1,
+      "position": [
+        460,
+        500
+      ],
+      "credentials": {
+        "karakeepApi": {
+          "id": "1",
+          "name": "Karakeep API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "tags",
+        "operation": "getTaggedBookmarks",
+        "tagId": "tag-example-id",
+        "additionalFields": {
+          "limit": 10,
+          "sortBy": "createdAt",
+          "sortOrder": "desc",
+          "archived": "false"
+        }
+      },
+      "id": "e5f6g7h8-9012-3456-7890-123456789012",
+      "name": "Get Tagged Bookmarks",
+      "type": "karakeep",
+      "typeVersion": 1,
+      "position": [
+        460,
+        700
+      ],
+      "credentials": {
+        "karakeepApi": {
+          "id": "1",
+          "name": "Karakeep API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "tagName",
+              "value": "={{ $json.name }}"
+            },
+            {
+              "name": "usageCount",
+              "value": "={{ $json.usageCount }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $json.usageCount > 0 ? 'Active' : 'Unused' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f6g7h8i9-0123-4567-8901-234567890123",
+      "name": "Format Tag Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        900,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "tags",
+        "operation": "update",
+        "tagId": "={{ $json.id }}",
+        "name": "={{ $json.name.toLowerCase().trim() }}",
+        "preventDuplicates": true
+      },
+      "id": "g7h8i9j0-1234-5678-9012-345678901234",
+      "name": "Standardize Tag Name",
+      "type": "karakeep",
+      "typeVersion": 1,
+      "position": [
+        680,
+        500
+      ],
+      "credentials": {
+        "karakeepApi": {
+          "id": "1",
+          "name": "Karakeep API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Generate tag usage report\nconst allTags = items;\nconst totalTags = allTags.length;\nconst usedTags = allTags.filter(item => item.json.usageCount > 0);\nconst unusedTags = allTags.filter(item => item.json.usageCount === 0);\nconst topTags = allTags\n  .filter(item => item.json.usageCount > 0)\n  .sort((a, b) => b.json.usageCount - a.json.usageCount)\n  .slice(0, 10);\n\nreturn [{\n  json: {\n    reportDate: new Date().toISOString(),\n    summary: {\n      totalTags,\n      usedTags: usedTags.length,\n      unusedTags: unusedTags.length,\n      usageRate: Math.round((usedTags.length / totalTags) * 100)\n    },\n    topTags: topTags.map(item => ({\n      name: item.json.name,\n      usageCount: item.json.usageCount\n    })),\n    unusedTags: unusedTags.map(item => ({\n      id: item.json.id,\n      name: item.json.name\n    }))\n  }\n}];"
+      },
+      "id": "h8i9j0k1-2345-6789-0123-456789012345",
+      "name": "Generate Usage Report",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        900,
+        600
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get All Tags",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create New Tag",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Tagged Bookmarks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Tags": {
+      "main": [
+        [
+          {
+            "node": "Filter Unused Tags",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Format Tag Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate Usage Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Unused Tags": {
+      "main": [
+        [
+          {
+            "node": "Delete Unused Tag",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Standardize Tag Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "1",
+  "id": "1",
+  "meta": {
+    "instanceId": "example"
+  },
+  "tags": [
+    {
+      "id": "tag-management",
+      "name": "Tag Management"
+    },
+    {
+      "id": "karakeep",
+      "name": "Karakeep"
+    }
+  ]
+}

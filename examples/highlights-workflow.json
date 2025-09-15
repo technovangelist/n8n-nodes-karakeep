@@ -1,0 +1,299 @@
+{
+  "name": "Karakeep Highlights Management",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "f8b8c8e0-1234-4567-8901-123456789abc",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "highlights",
+        "operation": "getAll",
+        "additionalFields": {
+          "limit": 10,
+          "bookmarkId": "bookmark-example-123"
+        }
+      },
+      "id": "a1b2c3d4-5678-9012-3456-789012345678",
+      "name": "Get Highlights",
+      "type": "karakeep",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ],
+      "credentials": {
+        "karakeepApi": {
+          "id": "1",
+          "name": "Karakeep API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Process highlights and prepare for analysis\nconst highlights = items.map(item => ({\n  id: item.json.id,\n  text: item.json.text,\n  note: item.json.note || '',\n  position: `${item.json.startOffset}-${item.json.endOffset}`,\n  bookmarkId: item.json.bookmarkId,\n  createdAt: item.json.createdAt\n}));\n\n// Group by bookmark for analysis\nconst groupedHighlights = highlights.reduce((acc, highlight) => {\n  if (!acc[highlight.bookmarkId]) {\n    acc[highlight.bookmarkId] = [];\n  }\n  acc[highlight.bookmarkId].push(highlight);\n  return acc;\n}, {});\n\nreturn Object.entries(groupedHighlights).map(([bookmarkId, highlights]) => ({\n  json: {\n    bookmarkId,\n    highlightCount: highlights.length,\n    highlights,\n    totalTextLength: highlights.reduce((sum, h) => sum + h.text.length, 0)\n  }\n}));"
+      },
+      "id": "b2c3d4e5-6789-0123-4567-890123456789",
+      "name": "Process Highlights",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "highlights",
+        "operation": "create",
+        "bookmarkId": "bookmark-example-456",
+        "text": "This is a new highlight created by the workflow",
+        "startOffset": 100,
+        "endOffset": 150,
+        "color": "green",
+        "note": "Created automatically by n8n workflow"
+      },
+      "id": "c3d4e5f6-7890-1234-5678-901234567890",
+      "name": "Create New Highlight",
+      "type": "karakeep",
+      "typeVersion": 1,
+      "position": [
+        460,
+        500
+      ],
+      "credentials": {
+        "karakeepApi": {
+          "id": "1",
+          "name": "Karakeep API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "highlights",
+        "operation": "update",
+        "highlightId": "highlight-to-update-123",
+        "note": "Updated note with additional context from workflow"
+      },
+      "id": "d4e5f6g7-8901-2345-6789-012345678901",
+      "name": "Update Highlight Note",
+      "type": "karakeep",
+      "typeVersion": 1,
+      "position": [
+        680,
+        500
+      ],
+      "credentials": {
+        "karakeepApi": {
+          "id": "1",
+          "name": "Karakeep API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Validate highlight data before creation\nconst validateHighlight = (data) => {\n  const { bookmarkId, text, startOffset, endOffset } = data;\n  \n  if (!bookmarkId || !bookmarkId.trim()) {\n    throw new Error('Bookmark ID is required');\n  }\n  \n  if (!text || !text.trim()) {\n    throw new Error('Highlight text cannot be empty');\n  }\n  \n  if (startOffset < 0) {\n    throw new Error('Start offset must be non-negative');\n  }\n  \n  if (endOffset <= startOffset) {\n    throw new Error('End offset must be greater than start offset');\n  }\n  \n  return true;\n};\n\n// Example validation for multiple highlights\nconst highlightsToValidate = [\n  {\n    bookmarkId: 'bookmark-789',\n    text: 'Important passage about machine learning',\n    startOffset: 200,\n    endOffset: 250,\n    color: 'yellow',\n    note: 'Key ML concept'\n  },\n  {\n    bookmarkId: 'bookmark-789',\n    text: 'Another significant quote',\n    startOffset: 300,\n    endOffset: 330,\n    color: 'red',\n    note: 'Supporting evidence'\n  }\n];\n\nconst validatedHighlights = highlightsToValidate.map(highlight => {\n  try {\n    validateHighlight(highlight);\n    return { ...highlight, status: 'valid' };\n  } catch (error) {\n    return { ...highlight, status: 'invalid', error: error.message };\n  }\n});\n\nreturn validatedHighlights.map(highlight => ({ json: highlight }));"
+      },
+      "id": "e5f6g7h8-9012-3456-7890-123456789012",
+      "name": "Validate Highlights",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        240,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "value2": "valid"
+            }
+          ]
+        }
+      },
+      "id": "f6g7h8i9-0123-4567-8901-234567890123",
+      "name": "Filter Valid Highlights",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        460,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "highlights",
+        "operation": "create",
+        "bookmarkId": "={{ $json.bookmarkId }}",
+        "text": "={{ $json.text }}",
+        "startOffset": "={{ $json.startOffset }}",
+        "endOffset": "={{ $json.endOffset }}",
+        "color": "={{ $json.color || 'yellow' }}",
+        "note": "={{ $json.note }}"
+      },
+      "id": "g7h8i9j0-1234-5678-9012-345678901234",
+      "name": "Create Valid Highlights",
+      "type": "karakeep",
+      "typeVersion": 1,
+      "position": [
+        680,
+        700
+      ],
+      "credentials": {
+        "karakeepApi": {
+          "id": "1",
+          "name": "Karakeep API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "highlights",
+        "operation": "getById",
+        "highlightId": "highlight-example-999"
+      },
+      "id": "h8i9j0k1-2345-6789-0123-456789012345",
+      "name": "Get Specific Highlight",
+      "type": "karakeep",
+      "typeVersion": 1,
+      "position": [
+        900,
+        300
+      ],
+      "credentials": {
+        "karakeepApi": {
+          "id": "1",
+          "name": "Karakeep API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Generate highlight analytics report\nconst highlights = items.filter(item => item.json.highlights);\n\nif (highlights.length === 0) {\n  return [{ json: { message: 'No highlights found for analysis' } }];\n}\n\nconst analytics = highlights.reduce((acc, item) => {\n  const { bookmarkId, highlightCount, highlights, totalTextLength } = item.json;\n  \n  acc.totalHighlights += highlightCount;\n  acc.totalTextLength += totalTextLength;\n  acc.bookmarksWithHighlights += 1;\n  \n  // Find most common words in highlights\n  highlights.forEach(highlight => {\n    const words = highlight.text.toLowerCase().match(/\\b\\w+\\b/g) || [];\n    words.forEach(word => {\n      if (word.length > 3) { // Only count words longer than 3 characters\n        acc.wordFrequency[word] = (acc.wordFrequency[word] || 0) + 1;\n      }\n    });\n  });\n  \n  return acc;\n}, {\n  totalHighlights: 0,\n  totalTextLength: 0,\n  bookmarksWithHighlights: 0,\n  wordFrequency: {}\n});\n\n// Get top 10 most frequent words\nconst topWords = Object.entries(analytics.wordFrequency)\n  .sort(([,a], [,b]) => b - a)\n  .slice(0, 10)\n  .map(([word, count]) => ({ word, count }));\n\nconst report = {\n  summary: {\n    totalHighlights: analytics.totalHighlights,\n    averageHighlightLength: Math.round(analytics.totalTextLength / analytics.totalHighlights),\n    bookmarksWithHighlights: analytics.bookmarksWithHighlights,\n    averageHighlightsPerBookmark: Math.round(analytics.totalHighlights / analytics.bookmarksWithHighlights)\n  },\n  topWords,\n  generatedAt: new Date().toISOString()\n};\n\nreturn [{ json: report }];"
+      },
+      "id": "i9j0k1l2-3456-7890-1234-567890123456",
+      "name": "Generate Analytics",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        900,
+        500
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Highlights",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create New Highlight",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Validate Highlights",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Highlights": {
+      "main": [
+        [
+          {
+            "node": "Process Highlights",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Specific Highlight",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Highlights": {
+      "main": [
+        [
+          {
+            "node": "Generate Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create New Highlight": {
+      "main": [
+        [
+          {
+            "node": "Update Highlight Note",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Highlights": {
+      "main": [
+        [
+          {
+            "node": "Filter Valid Highlights",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Valid Highlights": {
+      "main": [
+        [
+          {
+            "node": "Create Valid Highlights",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "1",
+      "name": "karakeep"
+    },
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "2",
+      "name": "highlights"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "versionId": "1"
+}

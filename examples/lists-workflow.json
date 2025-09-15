@@ -1,0 +1,321 @@
+{
+  "name": "Karakeep Lists Management Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "start",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "resource": "lists",
+        "operation": "create",
+        "name": "JavaScript Learning Resources",
+        "icon": "⚡",
+        "description": "A curated collection of JavaScript tutorials and references",
+        "type": "manual"
+      },
+      "id": "create-list",
+      "name": "Create JavaScript List",
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "resource": "bookmarks",
+        "operation": "search",
+        "searchQuery": "javascript tutorial",
+        "searchOptions": {
+          "sortOrder": "relevance",
+          "limit": 10,
+          "includeContent": false
+        }
+      },
+      "id": "search-bookmarks",
+      "name": "Search JS Bookmarks",
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "resource": "lists",
+        "operation": "addBookmarks",
+        "listId": "={{ $('create-list').item.json.id }}",
+        "bookmarkInputMethod": "single",
+        "bookmarkId": "={{ $json.id }}"
+      },
+      "id": "add-bookmarks",
+      "name": "Add Bookmarks to List",
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "resource": "lists",
+        "operation": "getById",
+        "listId": "={{ $('create-list').item.json.id }}"
+      },
+      "id": "get-final-list",
+      "name": "Get Final List",
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "resource": "lists",
+        "operation": "create",
+        "name": "React Resources",
+        "icon": "⚛️",
+        "description": "React-specific tutorials and documentation",
+        "type": "smart",
+        "query": "tag:react OR title:react"
+      },
+      "id": "create-react-list",
+      "name": "Create React List",
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [460, 500]
+    },
+    {
+      "parameters": {
+        "resource": "bookmarks",
+        "operation": "search",
+        "searchQuery": "react components",
+        "searchOptions": {
+          "sortOrder": "relevance",
+          "limit": 5,
+          "includeContent": false
+        }
+      },
+      "id": "search-react-bookmarks",
+      "name": "Search React Bookmarks",
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [680, 500]
+    },
+    {
+      "parameters": {
+        "resource": "lists",
+        "operation": "addBookmarks",
+        "listId": "={{ $('create-react-list').item.json.id }}",
+        "bookmarkInputMethod": "multiple",
+        "bookmarkIds": "={{ $json.map(item => item.id).join(', ') }}"
+      },
+      "id": "bulk-add-react",
+      "name": "Bulk Add React Bookmarks",
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [900, 500]
+    },
+    {
+      "parameters": {
+        "resource": "lists",
+        "operation": "getAll",
+        "additionalFields": {
+          "isPublic": true,
+          "limit": 20
+        }
+      },
+      "id": "get-all-public-lists",
+      "name": "Get All Public Lists",
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [1120, 500]
+    },
+    {
+      "parameters": {
+        "resource": "lists",
+        "operation": "update",
+        "listId": "={{ $json.id }}",
+        "description": "Updated: {{ $json.description }} ({{ $json.bookmarkCount }} bookmarks)"
+      },
+      "id": "update-list-descriptions",
+      "name": "Update List Descriptions",
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [1340, 500]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.bookmarkCount }}",
+              "operation": "smaller",
+              "value2": 3
+            }
+          ]
+        }
+      },
+      "id": "check-bookmark-count",
+      "name": "Check if List is Small",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1560, 500]
+    },
+    {
+      "parameters": {
+        "resource": "lists",
+        "operation": "delete",
+        "listId": "={{ $json.id }}"
+      },
+      "id": "delete-small-lists",
+      "name": "Delete Small Lists",
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [1780, 400]
+    },
+    {
+      "parameters": {
+        "resource": "lists",
+        "operation": "update",
+        "listId": "={{ $json.id }}",
+        "name": "📚 {{ $json.name }}"
+      },
+      "id": "add-emoji-to-large-lists",
+      "name": "Add Emoji to Large Lists",
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [1780, 600]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Create JavaScript List",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create React List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create JavaScript List": {
+      "main": [
+        [
+          {
+            "node": "Search JS Bookmarks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search JS Bookmarks": {
+      "main": [
+        [
+          {
+            "node": "Add Bookmarks to List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Bookmarks to List": {
+      "main": [
+        [
+          {
+            "node": "Get Final List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create React List": {
+      "main": [
+        [
+          {
+            "node": "Search React Bookmarks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search React Bookmarks": {
+      "main": [
+        [
+          {
+            "node": "Bulk Add React Bookmarks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bulk Add React Bookmarks": {
+      "main": [
+        [
+          {
+            "node": "Get All Public Lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Public Lists": {
+      "main": [
+        [
+          {
+            "node": "Update List Descriptions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update List Descriptions": {
+      "main": [
+        [
+          {
+            "node": "Check if List is Small",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if List is Small": {
+      "main": [
+        [
+          {
+            "node": "Delete Small Lists",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add Emoji to Large Lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-12-15T10:00:00.000Z",
+  "updatedAt": "2023-12-15T10:00:00.000Z",
+  "settings": {},
+  "staticData": {},
+  "meta": {
+    "description": "Comprehensive workflow demonstrating Karakeep Lists functionality including creation, bookmark management, bulk operations, and conditional logic.",
+    "tags": ["karakeep", "lists", "bookmarks", "automation"]
+  }
+}

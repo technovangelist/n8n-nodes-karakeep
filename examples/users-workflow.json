@@ -1,0 +1,304 @@
+{
+  "name": "Karakeep User Dashboard",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "f8b8c8e0-1234-4567-8901-234567890123",
+      "name": "When clicking 'Test workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "users",
+        "operation": "getCurrentUser"
+      },
+      "id": "a1b2c3d4-5678-9012-3456-789012345678",
+      "name": "Get Current User",
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ],
+      "credentials": {
+        "karakeepApi": {
+          "id": "1",
+          "name": "Karakeep API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "users",
+        "operation": "getUserStats"
+      },
+      "id": "b2c3d4e5-6789-0123-4567-890123456789",
+      "name": "Get User Stats",
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [
+        680,
+        300
+      ],
+      "credentials": {
+        "karakeepApi": {
+          "id": "1",
+          "name": "Karakeep API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Combine user profile and statistics into a dashboard format\nconst user = $('Get Current User').first().json;\nconst stats = $('Get User Stats').first().json;\n\n// Calculate account age in days\nconst accountAge = Math.floor((Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24));\n\n// Determine user activity level\nlet activityLevel = 'New User';\nif (stats.totalBookmarks > 100) {\n  activityLevel = 'Active User';\n}\nif (stats.totalBookmarks > 500) {\n  activityLevel = 'Power User';\n}\nif (stats.totalBookmarks > 1000) {\n  activityLevel = 'Super User';\n}\n\n// Create dashboard data\nconst dashboard = {\n  user: {\n    name: user.name || 'User',\n    email: user.email,\n    role: user.role,\n    accountAge: accountAge,\n    activityLevel: activityLevel,\n    memberSince: user.createdAt\n  },\n  statistics: {\n    totalBookmarks: stats.totalBookmarks,\n    totalLists: stats.totalLists,\n    totalTags: stats.totalTags,\n    totalHighlights: stats.totalHighlights,\n    totalAssets: stats.totalAssets\n  },\n  insights: {\n    averageBookmarksPerList: stats.totalLists > 0 ? Math.round(stats.totalBookmarks / stats.totalLists) : 0,\n    averageTagsPerBookmark: stats.totalBookmarks > 0 ? Math.round(stats.totalTags / stats.totalBookmarks * 100) / 100 : 0,\n    highlightRatio: stats.totalBookmarks > 0 ? Math.round(stats.totalHighlights / stats.totalBookmarks * 100) / 100 : 0,\n    assetRatio: stats.totalBookmarks > 0 ? Math.round(stats.totalAssets / stats.totalBookmarks * 100) / 100 : 0\n  },\n  summary: {\n    totalItems: stats.totalBookmarks + stats.totalLists + stats.totalTags + stats.totalHighlights + stats.totalAssets,\n    organizationScore: Math.min(100, Math.round((stats.totalLists * 10 + stats.totalTags * 2 + stats.totalHighlights * 1) / Math.max(1, stats.totalBookmarks) * 10))\n  }\n};\n\nreturn [{ json: dashboard }];"
+      },
+      "id": "c3d4e5f6-7890-1234-5678-901234567890",
+      "name": "Create Dashboard",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format dashboard data for display\nconst data = $input.first().json;\n\n// Create a formatted report\nconst report = `\n🎯 KARAKEEP USER DASHBOARD\n========================\n\n👤 USER PROFILE\n• Name: ${data.user.name}\n• Email: ${data.user.email}\n• Role: ${data.user.role.toUpperCase()}\n• Account Age: ${data.user.accountAge} days\n• Activity Level: ${data.user.activityLevel}\n• Member Since: ${new Date(data.user.memberSince).toLocaleDateString()}\n\n📊 CONTENT STATISTICS\n• 📚 Bookmarks: ${data.statistics.totalBookmarks.toLocaleString()}\n• 📋 Lists: ${data.statistics.totalLists.toLocaleString()}\n• 🏷️ Tags: ${data.statistics.totalTags.toLocaleString()}\n• ✨ Highlights: ${data.statistics.totalHighlights.toLocaleString()}\n• 📎 Assets: ${data.statistics.totalAssets.toLocaleString()}\n\n🔍 INSIGHTS\n• Avg Bookmarks per List: ${data.insights.averageBookmarksPerList}\n• Avg Tags per Bookmark: ${data.insights.averageTagsPerBookmark}\n• Highlight Ratio: ${data.insights.highlightRatio}\n• Asset Ratio: ${data.insights.assetRatio}\n\n📈 SUMMARY\n• Total Items: ${data.summary.totalItems.toLocaleString()}\n• Organization Score: ${data.summary.organizationScore}/100\n\n${data.summary.organizationScore >= 80 ? '🌟 Excellent organization!' : \n  data.summary.organizationScore >= 60 ? '👍 Good organization!' : \n  data.summary.organizationScore >= 40 ? '📝 Room for improvement' : \n  '🚀 Just getting started!'}\n`;\n\nreturn [{ \n  json: { \n    report: report,\n    dashboard: data,\n    timestamp: new Date().toISOString()\n  } \n}];"
+      },
+      "id": "d4e5f6g7-8901-2345-6789-012345678901",
+      "name": "Format Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition1",
+              "leftValue": "={{ $json.dashboard.user.role }}",
+              "rightValue": "admin",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e5f6g7h8-9012-3456-7890-123456789012",
+      "name": "Check if Admin",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Add admin-specific information\nconst data = $input.first().json;\n\nconst adminReport = data.report + `\n\n🔐 ADMIN INFORMATION\n• You have administrative privileges\n• Access to all user management features\n• Can view system-wide statistics\n• Manage user permissions and settings\n`;\n\nreturn [{ \n  json: { \n    ...data,\n    report: adminReport,\n    isAdmin: true\n  } \n}];"
+      },
+      "id": "f6g7h8i9-0123-4567-8901-234567890123",
+      "name": "Add Admin Info",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1560,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Standard user report\nconst data = $input.first().json;\n\nreturn [{ \n  json: { \n    ...data,\n    isAdmin: false\n  } \n}];"
+      },
+      "id": "g7h8i9j0-1234-5678-9012-345678901234",
+      "name": "Standard User",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1560,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "id": "h8i9j0k1-2345-6789-0123-456789012345",
+      "name": "Merge Reports",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1780,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Final output with recommendations\nconst data = $input.first().json;\nconst stats = data.dashboard.statistics;\n\n// Generate personalized recommendations\nlet recommendations = [];\n\nif (stats.totalBookmarks > 0 && stats.totalLists === 0) {\n  recommendations.push('📋 Consider creating lists to organize your bookmarks');\n}\n\nif (stats.totalBookmarks > 50 && stats.totalTags < stats.totalBookmarks * 0.5) {\n  recommendations.push('🏷️ Add more tags to improve bookmark discoverability');\n}\n\nif (stats.totalBookmarks > 20 && stats.totalHighlights === 0) {\n  recommendations.push('✨ Try highlighting important text in your bookmarks');\n}\n\nif (stats.totalBookmarks > 100 && stats.totalLists < 5) {\n  recommendations.push('📚 Create more lists to better organize your growing collection');\n}\n\nif (recommendations.length === 0) {\n  recommendations.push('🎉 Great job! Your Karakeep organization looks excellent!');\n}\n\nconst finalReport = data.report + `\n\n💡 RECOMMENDATIONS\n${recommendations.map(rec => `• ${rec}`).join('\\n')}\n\n---\nGenerated on: ${new Date().toLocaleString()}\n`;\n\nreturn [{ \n  json: { \n    ...data,\n    report: finalReport,\n    recommendations: recommendations\n  } \n}];"
+      },
+      "id": "i9j0k1l2-3456-7890-1234-567890123456",
+      "name": "Add Recommendations",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "When clicking 'Test workflow'": {
+      "main": [
+        [
+          {
+            "node": "Get Current User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Current User": {
+      "main": [
+        [
+          {
+            "node": "Get User Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User Stats": {
+      "main": [
+        [
+          {
+            "node": "Create Dashboard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Dashboard": {
+      "main": [
+        [
+          {
+            "node": "Format Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Report": {
+      "main": [
+        [
+          {
+            "node": "Check if Admin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Admin": {
+      "main": [
+        [
+          {
+            "node": "Add Admin Info",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Standard User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Admin Info": {
+      "main": [
+        [
+          {
+            "node": "Merge Reports",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Standard User": {
+      "main": [
+        [
+          {
+            "node": "Merge Reports",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Reports": {
+      "main": [
+        [
+          {
+            "node": "Add Recommendations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z",
+      "id": "tag1",
+      "name": "karakeep"
+    },
+    {
+      "createdAt": "2024-01-15T10:00:00.000Z", 
+      "updatedAt": "2024-01-15T10:00:00.000Z",
+      "id": "tag2",
+      "name": "dashboard"
+    },
+    {
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z", 
+      "id": "tag3",
+      "name": "users"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2024-01-15T10:00:00.000Z",
+  "versionId": "1"
+}

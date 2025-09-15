@@ -1,0 +1,224 @@
+{
+  "name": "Karakeep Assets Management",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "start",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://httpbin.org/image/png",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "http-request",
+      "name": "Download Sample Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "resource": "assets",
+        "operation": "upload",
+        "uploadMethod": "binary",
+        "binaryPropertyName": "data",
+        "filename": "sample-image.png",
+        "mimeType": "image/png"
+      },
+      "id": "upload-asset",
+      "name": "Upload to Karakeep",
+      "type": "karakeep",
+      "typeVersion": 1,
+      "position": [680, 300],
+      "credentials": {
+        "karakeepApi": {
+          "id": "1",
+          "name": "Karakeep API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "assets",
+        "operation": "getById",
+        "assetId": "={{ $json.id }}"
+      },
+      "id": "get-asset-info",
+      "name": "Get Asset Info",
+      "type": "karakeep",
+      "typeVersion": 1,
+      "position": [900, 300],
+      "credentials": {
+        "karakeepApi": {
+          "id": "1",
+          "name": "Karakeep API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "bookmarks",
+        "operation": "create",
+        "bookmarkType": "asset",
+        "assetType": "image",
+        "assetId": "={{ $('Upload to Karakeep').item.json.id }}",
+        "fileName": "sample-image.png",
+        "title": "Sample Image from Workflow",
+        "note": "This image was uploaded and bookmarked automatically via n8n workflow"
+      },
+      "id": "create-bookmark",
+      "name": "Create Asset Bookmark",
+      "type": "karakeep",
+      "typeVersion": 1,
+      "position": [1120, 300],
+      "credentials": {
+        "karakeepApi": {
+          "id": "1",
+          "name": "Karakeep API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "assets",
+        "operation": "download",
+        "assetId": "={{ $('Upload to Karakeep').item.json.id }}",
+        "returnFormat": "url"
+      },
+      "id": "get-download-url",
+      "name": "Get Download URL",
+      "type": "karakeep",
+      "typeVersion": 1,
+      "position": [680, 480],
+      "credentials": {
+        "karakeepApi": {
+          "id": "1",
+          "name": "Karakeep API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "assets",
+        "operation": "download",
+        "assetId": "={{ $('Upload to Karakeep').item.json.id }}",
+        "returnFormat": "binary",
+        "binaryPropertyName": "downloaded_file"
+      },
+      "id": "download-binary",
+      "name": "Download as Binary",
+      "type": "karakeep",
+      "typeVersion": 1,
+      "position": [900, 480],
+      "credentials": {
+        "karakeepApi": {
+          "id": "1",
+          "name": "Karakeep API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "filePath": "/tmp/downloaded-{{ $json.filename }}",
+        "binaryPropertyName": "downloaded_file"
+      },
+      "id": "write-file",
+      "name": "Save Downloaded File",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [1120, 480]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Download Sample Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Sample Image": {
+      "main": [
+        [
+          {
+            "node": "Upload to Karakeep",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Karakeep": {
+      "main": [
+        [
+          {
+            "node": "Get Asset Info",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Download URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Asset Info": {
+      "main": [
+        [
+          {
+            "node": "Create Asset Bookmark",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Download URL": {
+      "main": [
+        [
+          {
+            "node": "Download as Binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download as Binary": {
+      "main": [
+        [
+          {
+            "node": "Save Downloaded File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-01-15T10:00:00.000Z",
+  "versionId": "1"
+}
