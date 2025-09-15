@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-karakeep",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "n8n node for Karakeep bookmark management service",
   "keywords": [
     "n8n-community-node-package",
@@ -27,6 +27,20 @@
     "lint": "eslint 'nodes/**/*.ts' 'credentials/**/*.ts' package.json",
     "lintfix": "eslint 'nodes/**/*.ts' 'credentials/**/*.ts' package.json --fix",
     "test": "jest",
+    "test:coverage": "jest --coverage",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean",
+    "prepack": "npm run build",
+    "prepublish:patch": "npm version patch",
+    "prepublish:minor": "npm version minor",
+    "prepublish:major": "npm version major",
+    "publish:patch": "npm run prepublish:patch && npm run publish:release",
+    "publish:minor": "npm run prepublish:minor && npm run publish:release",
+    "publish:major": "npm run prepublish:major && npm run publish:release",
+    "publish:release": "npm run build && npm run test && npm pack && npm publish",
+    "publish:dry": "npm run build && npm run test && npm pack && npm publish --dry-run",
+    "publish": "./scripts/publish.sh",
+    "publish:quick": "npm run build && npm pack && npm publish",
     "link:n8n": "npm run build && npm link && cd ~/.n8n && npm link n8n-nodes-karakeep",
     "unlink:n8n": "cd ~/.n8n && npm unlink n8n-nodes-karakeep && npm unlink -g n8n-nodes-karakeep"
   },
