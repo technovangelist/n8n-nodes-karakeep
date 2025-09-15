@@ -70,6 +70,7 @@ The Karakeep node supports the following resources:
 
 You can find examples and sample workflows in the [examples directory](https://github.com/technovangelist/n8n-nodes-karakeep/tree/main/examples)
 
+
 ## License
 
 MIT
