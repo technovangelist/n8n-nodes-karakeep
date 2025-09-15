@@ -102,7 +102,7 @@ export const listsOperations: INodeProperties[] = [
 			},
 		},
 		default: '',
-		description: 'Query for smart lists (required when type is smart). <a href="https://docs.karakeep.app/guides/search-query-language" target="_blank">Learn about search query syntax</a>',
+		description: 'Query for smart lists (required when type is smart). <a href="https://docs.karakeep.app/guides/search-query-language" target="_blank">Learn about search query syntax</a>.',
 		placeholder: 'tag:javascript OR tag:react',
 	},
 	{
@@ -117,7 +117,7 @@ export const listsOperations: INodeProperties[] = [
 		},
 		default: '',
 		description: 'ID of parent list for nested organization',
-		placeholder: 'parent-list-id',
+		placeholder: 'parent-list-ID',
 	},
 
 	// Update list parameters
@@ -180,10 +180,9 @@ export const listsOperations: INodeProperties[] = [
 				type: 'number',
 				typeOptions: {
 					minValue: 1,
-					maxValue: 100,
 				},
-				default: 20,
-				description: 'Number of lists to return per page (max 100)',
+				default: 50,
+				description: 'Max number of results to return',
 			},
 			{
 				displayName: 'Is Public',
@@ -206,7 +205,7 @@ export const listsOperations: INodeProperties[] = [
 						description: 'Return only private lists',
 					},
 				],
-				default: undefined,
+				default: '',
 				description: 'Filter by list visibility',
 			},
 		],
@@ -268,6 +267,6 @@ export const listsOperations: INodeProperties[] = [
 		},
 		default: '',
 		description: 'Comma-separated list of bookmark IDs to add or remove',
-		placeholder: 'bookmark-id-1, bookmark-id-2, bookmark-id-3',
+		placeholder: 'bookmark-ID-1, bookmark-id-2, bookmark-id-3',
 	},
 ];

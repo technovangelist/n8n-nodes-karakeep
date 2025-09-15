@@ -90,7 +90,7 @@ export const assetsOperations: INodeProperties[] = [
 		},
 		options: [
 			{
-				name: 'Auto-detect',
+				name: 'Auto-Detect',
 				value: '',
 				description: 'Automatically detect from binary data',
 			},

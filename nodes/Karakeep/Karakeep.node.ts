@@ -49,38 +49,37 @@ export class Karakeep implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
-						name: 'Bookmarks',
+						name: 'Bookmark',
 						value: 'bookmarks',
 						description: 'Manage bookmarks and their content',
 					},
 					{
-						name: 'Lists',
+						name: 'List',
 						value: 'lists',
 						description: 'Manage bookmark collections and lists',
 					},
 					{
-						name: 'Tags',
+						name: 'Tag',
 						value: 'tags',
 						description: 'Manage bookmark tags and categories',
 					},
 					{
-						name: 'Highlights',
+						name: 'Highlight',
 						value: 'highlights',
 						description: 'Manage text highlights and annotations',
 					},
 					{
-						name: 'Users',
+						name: 'User',
 						value: 'users',
 						description: 'Manage user accounts and permissions',
 					},
 					{
-						name: 'Assets',
+						name: 'Asset',
 						value: 'assets',
 						description: 'Manage files and media assets',
 					},
 				],
 				default: 'bookmarks',
-				description: 'The resource to operate on',
 			},
 			// Bookmarks Operations
 			{
@@ -95,10 +94,10 @@ export class Karakeep implements INodeType {
 				},
 				options: [
 					{
-						name: 'Get All',
+						name: 'Get Many',
 						value: 'getAll',
-						description: 'Retrieve all bookmarks',
-						action: 'Get all bookmarks',
+						description: 'Retrieve many bookmarks',
+						action: 'Get many bookmarks',
 					},
 					{
 						name: 'Get by ID',
@@ -144,7 +143,6 @@ export class Karakeep implements INodeType {
 					},
 				],
 				default: 'getAll',
-				description: 'The operation to perform on bookmarks',
 			},
 			// Lists Operations
 			{
@@ -159,10 +157,10 @@ export class Karakeep implements INodeType {
 				},
 				options: [
 					{
-						name: 'Get All',
+						name: 'Get Many',
 						value: 'getAll',
-						description: 'Retrieve all lists',
-						action: 'Get all lists',
+						description: 'Retrieve many lists',
+						action: 'Get many lists',
 					},
 					{
 						name: 'Get by ID',
@@ -202,7 +200,6 @@ export class Karakeep implements INodeType {
 					},
 				],
 				default: 'getAll',
-				description: 'The operation to perform on lists',
 			},
 			// Tags Operations
 			{
@@ -217,10 +214,10 @@ export class Karakeep implements INodeType {
 				},
 				options: [
 					{
-						name: 'Get All',
+						name: 'Get Many',
 						value: 'getAll',
-						description: 'Retrieve all tags',
-						action: 'Get all tags',
+						description: 'Retrieve many tags',
+						action: 'Get many tags',
 					},
 					{
 						name: 'Get by ID',
@@ -254,7 +251,6 @@ export class Karakeep implements INodeType {
 					},
 				],
 				default: 'getAll',
-				description: 'The operation to perform on tags',
 			},
 			// Highlights Operations
 			{
@@ -269,10 +265,10 @@ export class Karakeep implements INodeType {
 				},
 				options: [
 					{
-						name: 'Get All',
+						name: 'Get Many',
 						value: 'getAll',
-						description: 'Retrieve all highlights',
-						action: 'Get all highlights',
+						description: 'Retrieve many highlights',
+						action: 'Get many highlights',
 					},
 					{
 						name: 'Get by ID',
@@ -300,7 +296,6 @@ export class Karakeep implements INodeType {
 					},
 				],
 				default: 'getAll',
-				description: 'The operation to perform on highlights',
 			},
 			// Users Operations
 			{
@@ -328,7 +323,6 @@ export class Karakeep implements INodeType {
 					},
 				],
 				default: 'getCurrentUser',
-				description: 'The operation to perform on users',
 			},
 			// Assets Operations
 			{
@@ -362,7 +356,6 @@ export class Karakeep implements INodeType {
 					},
 				],
 				default: 'upload',
-				description: 'The operation to perform on assets',
 			},
 			...bookmarksOperations,
 			...listsOperations,

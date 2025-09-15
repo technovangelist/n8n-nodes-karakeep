@@ -442,10 +442,9 @@ export const bookmarksOperations: INodeProperties[] = [
 				type: 'number',
 				typeOptions: {
 					minValue: 1,
-					maxValue: 100,
 				},
-				default: 20,
-				description: 'Number of bookmarks to return per page (max 100)',
+				default: 50,
+				description: 'Max number of results to return',
 			},
 			{
 				displayName: 'Archived',
@@ -506,7 +505,7 @@ export const bookmarksOperations: INodeProperties[] = [
 			},
 		},
 		default: '',
-		description: 'Search query to find bookmarks. <a href="https://docs.karakeep.app/guides/search-query-language" target="_blank">Learn about search query syntax</a>',
+		description: 'Search query to find bookmarks. <a href="https://docs.karakeep.app/guides/search-query-language" target="_blank">Learn about search query syntax</a>.',
 		placeholder: 'Enter search terms',
 	},
 	{
@@ -552,10 +551,9 @@ export const bookmarksOperations: INodeProperties[] = [
 				type: 'number',
 				typeOptions: {
 					minValue: 1,
-					maxValue: 100,
 				},
-				default: 20,
-				description: 'Maximum number of results to return',
+				default: 50,
+				description: 'Max number of results to return',
 			},
 			{
 				displayName: 'Cursor',
@@ -690,7 +688,6 @@ export const bookmarksOperations: INodeProperties[] = [
 			},
 		],
 		default: 'attach',
-		description: 'The asset operation to perform',
 	},
 	{
 		displayName: 'Asset ID',

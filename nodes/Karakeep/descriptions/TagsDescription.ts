@@ -109,10 +109,9 @@ export const tagsOperations: INodeProperties[] = [
 				type: 'number',
 				typeOptions: {
 					minValue: 1,
-					maxValue: 100,
 				},
-				default: 20,
-				description: 'Number of tags to return per page (max 100)',
+				default: 50,
+				description: 'Max number of results to return',
 			},
 			{
 				displayName: 'Sort By',
@@ -197,10 +196,9 @@ export const tagsOperations: INodeProperties[] = [
 				type: 'number',
 				typeOptions: {
 					minValue: 1,
-					maxValue: 100,
 				},
-				default: 20,
-				description: 'Number of bookmarks to return per page (max 100)',
+				default: 50,
+				description: 'Max number of results to return',
 			},
 			{
 				displayName: 'Sort By',

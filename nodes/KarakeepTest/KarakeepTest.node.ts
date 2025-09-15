@@ -101,14 +101,14 @@ export class KarakeepTest implements INodeType {
 						description: 'Maximum number of retry attempts',
 					},
 					{
-						displayName: 'Base Delay (ms)',
+						displayName: 'Base Delay (Ms)',
 						name: 'baseDelay',
 						type: 'number',
 						default: 1000,
 						description: 'Base delay between retries in milliseconds',
 					},
 					{
-						displayName: 'Max Delay (ms)',
+						displayName: 'Max Delay (Ms)',
 						name: 'maxDelay',
 						type: 'number',
 						default: 30000,
@@ -131,7 +131,7 @@ export class KarakeepTest implements INodeType {
 						description: 'Maximum requests per second',
 					},
 					{
-						displayName: 'Queue Timeout (ms)',
+						displayName: 'Queue Timeout (Ms)',
 						name: 'queueTimeout',
 						type: 'number',
 						default: 30000,

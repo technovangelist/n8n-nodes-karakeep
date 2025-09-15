@@ -10,23 +10,22 @@
     "workflow"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/your-username/n8n-nodes-karakeep",
+  "homepage": "https://github.com/technovangelist/n8n-nodes-karakeep",
   "author": {
-    "name": "Your Name",
-    "email": "your.email@example.com"
+    "name": "Matthew Williams",
+    "email": "m@technovangelist.com"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/your-username/n8n-nodes-karakeep.git"
+    "url": "git+https://github.com/technovangelist/n8n-nodes-karakeep.git"
   },
   "main": "index.js",
   "scripts": {
     "build": "tsc && gulp build:icons",
     "dev": "tsc --watch",
     "format": "prettier nodes credentials --write",
-    "lint": "eslint nodes credentials package.json",
-    "lintfix": "eslint nodes credentials package.json --fix",
-    "prepublishOnly": "npm run build && npm run lint -s",
+    "lint": "eslint 'nodes/**/*.ts' 'credentials/**/*.ts' package.json",
+    "lintfix": "eslint 'nodes/**/*.ts' 'credentials/**/*.ts' package.json --fix",
     "test": "jest",
     "link:n8n": "npm run build && npm link && cd ~/.n8n && npm link n8n-nodes-karakeep",
     "unlink:n8n": "cd ~/.n8n && npm unlink n8n-nodes-karakeep && npm unlink -g n8n-nodes-karakeep"

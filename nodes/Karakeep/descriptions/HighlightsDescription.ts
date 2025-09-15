@@ -211,7 +211,7 @@ export const highlightsOperations: INodeProperties[] = [
 				value: 'blue',
 			},
 		],
-		default: '',
+		default: 'yellow',
 		description: 'Update the color of the highlight (optional)',
 	},
 
@@ -245,10 +245,9 @@ export const highlightsOperations: INodeProperties[] = [
 				type: 'number',
 				typeOptions: {
 					minValue: 1,
-					maxValue: 100,
 				},
-				default: 20,
-				description: 'Number of highlights to return per page (max 100)',
+				default: 50,
+				description: 'Max number of results to return',
 			},
 			{
 				displayName: 'Bookmark ID',
@@ -256,7 +255,7 @@ export const highlightsOperations: INodeProperties[] = [
 				type: 'string',
 				default: '',
 				description: 'Filter highlights by bookmark ID',
-				placeholder: 'bookmark-id-123',
+				placeholder: 'bookmark-ID-123',
 			},
 		],
 	},
